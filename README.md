@@ -1,5 +1,8 @@
 # Notebook
 
+
+Run these notebooks in a container
+
 ```shell
-conda create -n docker -y --no-default-packages --override-channels -c conda-forge nomkl graphviz ipython jupyter jupyter_contrib_extensions
+docker run -d -p 8888:8888 -v ./notebooks:/notebooks -w /notebooks jseabold/dask-jupyter bash -c "jupyter notebook --no-browser --ip='*'"
 ```

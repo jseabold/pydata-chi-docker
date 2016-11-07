@@ -1,0 +1,41 @@
+version: "2"
+services:
+  jupyter:
+    image: jseabold/dask-jupyter:latest
+    command: ["bash", "-c", "jupyter notebook --no-browser --ip='*'"]
+    volumes:
+      - ./notebooks:/notebooks
+    working_dir: /notebooks
+    ports:
+      - "8888:8888"
+    networks:
+      - distributed
+    links:
+      - dask-scheduler
+    container_name: jupyter
+
+  dask-scheduler:
+    image: jseabold/dask-scheduler:latest
+    ports:
+      - "8786:8786"
+      - "9786:9786"
+      - "8787:8787"
+    command: ["bash", "-c", "dask-scheduler --host dask-scheduler"]
+    networks:
+      - distributed
+    container_name: dask-scheduler
+
+  dask-worker:
+    image: jseabold/dask-worker:latest
+    command: ["bash", "-c", "dask-worker dask-scheduler:8786 --nthreads 1 --nprocs 1"]
+    mem_limit: 1500m
+    volumes:
+      - ./notebooks:/notebooks
+    networks:
+      - distributed
+    links:
+      - dask-scheduler
+
+networks:
+  distributed:
+    driver: bridge
